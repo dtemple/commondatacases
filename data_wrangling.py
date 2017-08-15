@@ -22,7 +22,7 @@ train_df.info()
 # Use describe(include=['O']) to select just categorical object types (returns count, unique, top, freq)
 train_df.describe(include=['O'])
 
-# value_counts for absolute numbers from results
+# value_counts for numbers from results
 train_df["Survived"].value_counts()
 
 # value_counts with normalize for percentages
@@ -75,9 +75,18 @@ x=pd.pivot_table(train_df[['Pclass','Sex','SibSp','Parch']], index=['Sex'], aggf
 # Add a calculated column to a pivot table #
 x['sum']=x.sum(axis=1)
 
-# get the % who survived #
+# get the % who survived # (Note: there's probably a much easier way to do this)
 x=train_df[['Survived','Embarked']].groupby(['Embarked'], as_index=False).sum() # The number of survivors
 y=train_df[['Survived','Embarked']].groupby(['Embarked'], as_index=False).count() # The number of total people
 y.rename(columns={'Survived':'total'}, inplace=True)
+z=pd.merge(x,y) # Remember that you'll need an index, which you can create with x['Embarked']=x.index
 
-z=pd.merge(x,y)
+# Find the rows where Embarked is null #
+train_df2=train_df[train_df['Embarked'].isnull()]
+
+# Use CROSSTAB for quick comparison of two columns #
+pd.crosstab(train_df['Embarked'],train_df['Survived'])
+
+# Use CUT Break the data into bins #
+train_df['AgeBand'] = pd.cut(train_df['Age'], 10)
+
